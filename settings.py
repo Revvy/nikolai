@@ -1,14 +1,18 @@
 HOST = 'irc.adelais.net'
 PORT = 6667
 BOTNAME = 'hurrdurr'
+BOTUSER = 'py py py py py bot'
 
+MASTERS = {}
 PASSWORD = 'password'
+
 
 # (channel name, password [optional])
 CHANNELS = [
 	('#omgabot', ''),
 	]
 
+AUTOJOIN = True
 GREETING = 'hurr'
 
 # All relevant commands that you want processed should start with this string

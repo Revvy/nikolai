@@ -1,91 +1,40 @@
+"""
+This is the core and main module. The majority of the functionality of the bot
+should be imported from other modules to keep things easy to hotswap.
+"""
 import socket
-import settings
-import types
+
 import commands
-from tokenizer import Data
+import tokenizer
+import settings
 
 class Bot(object):
-    def __init__(self, **args):
-        self.autojoin = args.get('autojoin', True)
-        self.greet = args.get('greet', True)
-        
-        self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    def __init__(self):
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.commands = commands.get_commands()
 
-        self.commands = self._get_commands()
-
-        self.masters = {}
-
-
-        
     def connect(self):
-        """ 
-            Connects to the specified host in settings.py and, optionally, joins all channels
-        """
-        
-        self.irc.connect((settings.HOST, settings.PORT))
-        
-        print self.irc.recv(4096)
-        
-        self.irc.send("NICK %s\r\n" % (settings.BOTNAME,))
-        self.irc.send("USER py py py py py bot\r\n")
-        
-        if self.autojoin:
+        self.socket.connect((settings.HOST, settings.PORT))
+        self.socket.send("NICK %s\r\n" % (settings.BOTNAME,))
+        self.socket.send("USER %s\r\n" % (settings.BOTUSER,))
+
+        if settings.AUTOJOIN:
             for channel in settings.CHANNELS:
-                self._join(channel[0])
-        
-        if self.greet:
+                self.socket.send("JOIN %s %s\r\n" % (channel[0],channel[1]))
+
+        if settings.GREETING:
             for channel in settings.CHANNELS:
-                self._msg(channel[0], settings.GREETING)
+                self.socket.send("PRIVMSG %s :%s\r\n" % (channel[0], settings.GREETING))
         
         while True:
-            data = Data(self.irc.recv(4096))
+            tokenizer.Data(self)
 
-            if data.type == "PRIVMSG":
-                for command in self.commands:
-                    try:
-                        command(self, data)
-                    except:
-                        print 'Failed to execute %s' % command
-
-            elif data.type == "PING":
-                self._send("PONG")
-
-            print data
-
-    def _send(self, data):
-        """
-        Sends data to the server with a printout.
-        """
-        self.irc.send(data)
-        print '>>> %s' % data
-    
-    def _msg(self, channel, text):
-        """ 
-        Channel message
-        """
-        self._send("PRIVMSG %s :%s\r\n" % (channel, text))
-    
-    def _join(self, channel, password=''):
-        """
-        Join a channel
-        """
-        self._send("JOIN %s %s\r\n" % (channel,password))
-    
-    def _get_commands(self):
-        """
-        Get all commands to respond to
-        """
-       
-        return [v for k,v in commands.__dict__.items() if type(v) is types.FunctionType and k.startswith(settings.COMMAND_PREFIX)]
-
-    def _reload_commands(self):
-        """
-        Reloads the commands to respond to.
-        """
+    def reload(self):
         reload(commands)
-        self.commands = self._get_commands()
+        reload(tokenizer)
+        reload(settings)
+        self.commands = commands.get_commands()
         
-
 if __name__ == '__main__':
     bot = Bot()
     bot.connect()
