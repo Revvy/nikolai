@@ -4,7 +4,7 @@ import re
 class Data(object):
     def __init__(self, bot):
         self.bot = bot
-        self.raw_data = bot.socket.recv(4096)
+        self.raw_data = bot.data
         print self.raw_data
 
         if re.search('^:(.+)!(.+)@(.+) (.+) (.+) :(.+)$', self.raw_data):

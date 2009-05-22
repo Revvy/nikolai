@@ -27,6 +27,7 @@ class Bot(object):
                 self.socket.send("PRIVMSG %s :%s\r\n" % (channel[0], settings.GREETING))
         
         while True:
+            self.data = self.socket.recv(4096)
             tokenizer.Data(self)
 
     def reload(self):
