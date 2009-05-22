@@ -1,30 +1,14 @@
-HOST = 'irc.adelais.net'
-PORT = 6667
-BOTNAME = 'hurrdurr'
-BOTUSER = 'py py py py py bot'
+# Connection settings go here.
+defaultNick = 'hurrdurr'
+altNick = 'hurrdurrr'
 
-MASTERS = {}
-PASSWORD = 'password'
+defaultUser = 'py py py py py bot'
 
+#Networks must have 'host' and 'channels'. 'nick' and 'user' are optional
+networks = [
+    {'host':'irc.adelais.net', 'channels':(('#omgabot',''))},
+    {'host':'irc.efnet.net', 'channels':(('#omgabot', '')), 'nick':'hurdurian'},
+    ]
 
-# (channel name, password [optional])
-CHANNELS = [
-	('#omgabot', ''),
-	]
-
-AUTOJOIN = True
-GREETING = 'hurr'
-
-# All relevant commands that you want processed should start with this string
-# Contained within the commands module
-# Yea, MUDs and all that.  I've been a nerd for a while
-COMMAND_PREFIX = 'do_'
+#Bot settings go here.
 COMMAND_TOKEN = '@'
-
-# Local settings override
-try:
-    from local_settings import *
-except ImportError:
-    pass
-
-
